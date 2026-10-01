@@ -149,6 +149,7 @@ sup{font-size:.7em}
       <span class="eyebrow">Олимпиада «Физтех» · математика · 9–11 класс</span>
       <h1>Физтех-отбор: что подтянуть до тура</h1>
       <p>14 задач по 7 темам отборочного этапа. Впишите ответы — получите карту пробелов и план по дням до ближайшего тура. Около 25 минут, без регистрации.</p>
+      <p>Набор тем зависит от класса: в 9 классе нет тригонометрии, логарифмов и стереометрии, в 10 — логарифмов и стереометрии.</p>
       <p>Задачи — базового уровня: если тема проседает здесь, на отборе она не сработает.</p>
     </header>
 
@@ -214,7 +215,7 @@ sup{font-size:.7em}
 </div>
 
 <script>
-const TOPICS=[
+const POOL=[
  {id:"alg",name:"Уравнения",tasks:[
    {q:"Решите уравнение √(x + 7) = x − 5.",a:9,tip:"При возведении в квадрат появляется посторонний корень. Проверка или условие x ≥ 5."},
    {q:"Найдите сумму всех корней уравнения |x² − 4x| = 3.",a:8,tip:"Модуль даёт два квадратных уравнения, корни нужно сложить из обоих."}]},
@@ -236,7 +237,30 @@ const TOPICS=[
  {id:"num",name:"Числа и комбинаторика",tasks:[
    {q:"Сколько натуральных делителей у числа 360?",a:24,tip:"360 = 2³·3²·5, число делителей (3+1)(2+1)(1+1)."},
    {q:"Сколько существует трёхзначных чисел с суммой цифр 5?",a:15,tip:"Первая цифра ≥ 1: шары и перегородки, C(6, 2)."}]}
+, {id:"ineq9",name:"Неравенства и модуль",tasks:[
+   {q:"Сколько целых решений имеет неравенство |2x − 3| ≤ 5?",a:6,tip:"−5 ≤ 2x − 3 ≤ 5, то есть −1 ≤ x ≤ 4."},
+   {q:"Найдите наименьшее целое решение неравенства (x + 4)(x − 1) / (x − 3) > 0.",a:-3,tip:"Метод интервалов: решение (−4; 1) ∪ (3; +∞)."}]},
+ {id:"sys",name:"Системы и текстовые задачи",tasks:[
+   {q:"Решите систему x + 2y = 7, 3x − y = 7. В ответ запишите x·y.",a:6,tip:"Выразите y из второго уравнения: x = 3, y = 2."},
+   {q:"Двое рабочих вместе выполняют работу за 6 часов, первый в одиночку — за 10 часов. За сколько часов выполнит работу второй в одиночку?",a:15,tip:"Производительности складываются: 1/6 − 1/10 = 1/15."}]},
+ {id:"prog",name:"Прогрессии и функции",tasks:[
+   {q:"В арифметической прогрессии a₁ = 3, a₅ = 19. Найдите сумму первых 10 членов.",a:210,tip:"d = 4, a₁₀ = 39, S = (3 + 39)·10 / 2."},
+   {q:"Найдите наименьшее значение функции y = x² − 6x + 11.",a:2,tip:"Выделите полный квадрат: (x − 3)² + 2."}]},
+ {id:"param9",name:"Квадратный трёхчлен",tasks:[
+   {q:"x₁ и x₂ — корни уравнения x² − 5x + 3 = 0. Найдите x₁² + x₂².",a:19,tip:"Теорема Виета: (x₁ + x₂)² − 2x₁x₂ = 25 − 6."},
+   {q:"Один из корней уравнения x² + ax − 12 = 0 равен 3. Найдите другой корень.",a:-4,tip:"По Виета x₁·x₂ = −12."}]},
+ {id:"pow",name:"Степени и корни",tasks:[
+   {q:"Вычислите 27<sup>2/3</sup> + 16<sup>−1/2</sup> · 8.",a:11,tip:"27^(2/3) = 9, 16^(−1/2) = 1/4."},
+   {q:"Решите уравнение √(2x + 1) = x − 1.",a:4,tip:"После возведения в квадрат корень x = 0 посторонний: нужно x ≥ 1."}]}
 ];
+const SETS={
+ 9:["alg","ineq9","sys","prog","param9","plan","num"],
+ 10:["alg","trig","pow","ineq","prog","plan","num"],
+ 11:["alg","trig","log","ineq","plan","stereo","num"]
+};
+const topicsFor=g=>SETS[g].map(id=>POOL.find(t=>t.id===id));
+let TOPICS;
+
 const TOURS=[
  {n:"1-й тур",date:"2026-10-11",grades:[9,10,11]},
  {n:"2-й тур",date:"2026-11-01",grades:[9,10,11]},
@@ -246,7 +270,9 @@ const SAMPLE_OK=[1,1,0,1,1,1,0,0,1,1,1,0,1,1];
 const MONTHS=["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"];
 const $=s=>document.querySelector(s);
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let state=Object.assign({grade:11,hours:2,answers:{},checked:false},store.get("fo-state")||{});
+let state=Object.assign({grade:11,hours:2,answers:{},checked:false,byGrade:{}},store.get("fo-state")||{});
+if(!state.byGrade)state.byGrade={};
+TOPICS=topicsFor(state.grade);
 
 function today(){const d=new Date();d.setHours(0,0,0,0);return d}
 function parse(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
@@ -267,7 +293,6 @@ function plural(n,a,b,c){const m=n%10,h=n%100;return n+" "+(m===1&&h!==11?a:(m>=
 function renderForm(){
   let k=0;
   $("#form").innerHTML=TOPICS.map(tp=>`<div class="topic"><div class="topic-name">${tp.name}</div>${tp.tasks.map(ts=>{k++;const id="a"+k;return `<div class="task" data-k="${k}"><span class="n">${String(k).padStart(2,"0")}</span><label class="q" for="${id}">${ts.q}</label><input id="${id}" inputmode="decimal" aria-label="Ответ к задаче ${k}" value="${state.answers[k]??""}"><span class="mark">Верный ответ: ${ts.a}. ${ts.tip}</span></div>`}).join("")}</div>`).join("");
-  $("#form").addEventListener("input",e=>{if(e.target.matches("input")){state.answers[e.target.closest(".task").dataset.k]=e.target.value;state.checked=false;clearMarks();save();countFilled()}});
   countFilled();
 }
 function countFilled(){const n=Object.values(state.answers).filter(v=>String(v).trim()!=="").length;$("#filled").textContent=n+" / 14 заполнено"}
@@ -318,8 +343,9 @@ $("#form").addEventListener("submit",e=>{
   e.preventDefault();state.checked=true;save();mark();
   $("#result").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
 });
+$("#form").addEventListener("input",e=>{if(e.target.matches("input")){state.answers[e.target.closest(".task").dataset.k]=e.target.value;state.checked=false;clearMarks();save();countFilled()}});
 $("#reset").addEventListener("click",()=>{state.answers={};state.checked=false;save();renderForm();clearMarks()});
-$("#grade").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.grade=+b.dataset.g;save();renderSide();render()});
+$("#grade").addEventListener("click",e=>{const b=e.target.closest("button");if(!b||+b.dataset.g===state.grade)return;state.byGrade[state.grade]={answers:state.answers,checked:state.checked};state.grade=+b.dataset.g;const saved=state.byGrade[state.grade]||{answers:{},checked:false};state.answers=saved.answers;state.checked=saved.checked;TOPICS=topicsFor(state.grade);save();renderSide();renderForm();if(state.checked)mark();else clearMarks()});
 $("#hours").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.hours=+b.dataset.h;save();renderSide();render()});
 $("#copy").addEventListener("click",()=>{
   const sc=scores();const total=sc.reduce((s,x)=>s+x.s,0);
