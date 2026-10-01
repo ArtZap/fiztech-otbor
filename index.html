@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Бесплатная диагностика к отборочному этапу олимпиады «Физтех» по математике: 14 задач, карта пробелов и план по дням до тура.">
+<meta property="og:title" content="Физтех-отбор: что подтянуть до тура">
+<meta property="og:description" content="Бесплатная диагностика к отбору олимпиады «Физтех» по математике: 14 задач, карта пробелов и план по дням до тура.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<title>Физтех-отбор</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Unbounded:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: бланк ответов олимпиады — узкая колонка «до тура» слева, лист с задачами справа; на телефоне одна колонка */
+:root{
+  --paper:#f5f6f9; --sheet:#ffffff; --ink:#1d2a6b; --text:#1b1e27; --muted:#5d6475;
+  --rule:#d9dce6; --cell:#eef0f6; --ok:#1f7a4d; --bad:#c2372b; --warn:#b7791f;
+  --display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#11131a; --sheet:#181b24; --ink:#9fb0ff; --text:#e6e8ef; --muted:#9aa1b2;
+  --rule:#2b3040; --cell:#20242f; --ok:#4fc28a; --bad:#ff7a6e; --warn:#e3a94b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11131a; --sheet:#181b24; --ink:#9fb0ff; --text:#e6e8ef; --muted:#9aa1b2;
+  --rule:#2b3040; --cell:#20242f; --ok:#4fc28a; --bad:#ff7a6e; --warn:#e3a94b; color-scheme:dark}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0}
+img{max-width:100%}
+body{background:var(--paper);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:24px 64px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:300px minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:860px){.wrap{grid-template-columns:minmax(0,1fr)}}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;color:var(--text)}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.1;letter-spacing:-.01em}
+h2{font-size:20px;font-weight:500}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:20px}
+@media (max-width:860px){.side{position:static}}
+.count{border:2px solid var(--ink);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:6px;background:var(--sheet)}
+.count .num{font-family:var(--display);font-size:56px;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.tours{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.tours li{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--rule);padding-bottom:6px}
+.tours li.past{color:var(--muted);text-decoration:line-through}
+.tours li.next{font-weight:600;color:var(--ink)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;color:var(--muted);font-weight:500}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 15px var(--mono);padding:8px 14px;border:1px solid var(--rule);background:var(--sheet);color:var(--text);border-radius:4px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--sheet);border-color:var(--ink)}
+.side p{margin:0;font-size:14px;color:var(--muted)}
+.main{display:flex;flex-direction:column;gap:28px;min-width:0}
+.intro{display:flex;flex-direction:column;gap:12px;max-width:65ch}
+.intro p{margin:0;color:var(--muted)}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.sheet-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding:14px 20px;border-bottom:2px solid var(--ink)}
+.sheet-head .meta{font:13px var(--mono);color:var(--muted)}
+.topic{border-bottom:1px solid var(--rule)}
+.topic:last-child{border-bottom:0}
+.topic-name{padding:10px 20px;background:var(--cell);font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+.task{display:grid;grid-template-columns:40px minmax(0,1fr) 120px;gap:12px;align-items:center;padding:14px 20px;border-top:1px solid var(--rule)}
+.task:first-of-type{border-top:0}
+.task .n{font:600 14px var(--mono);color:var(--muted)}
+.task .q{min-width:0}
+.task input{width:100%;font:600 18px var(--mono);text-align:center;padding:8px;border:1.5px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--text)}
+.task input:focus-visible,button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.task.ok input{border-color:var(--ok);color:var(--ok)}
+.task.bad input{border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.task .mark{grid-column:2/4;font-size:13px;color:var(--bad);display:none}
+.task.bad .mark{display:block}
+@media (max-width:520px){.task{grid-template-columns:32px minmax(0,1fr)}.task input{grid-column:2}.task .mark{grid-column:2}}
+.actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:16px 20px;border-top:2px solid var(--ink)}
+.btn{font:600 15px var(--body);padding:12px 20px;border-radius:4px;border:1.5px solid var(--ink);background:var(--ink);color:var(--sheet);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.hint{font-size:13px;color:var(--muted)}
+.result{display:flex;flex-direction:column;gap:20px}
+.badge{display:inline-block;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:3px;border:1px solid var(--warn);color:var(--warn)}
+.map{display:flex;flex-direction:column;gap:10px}
+.row{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 64px;gap:12px;align-items:center;font-size:14px}
+.bar{height:12px;background:var(--cell);border-radius:2px;position:relative;overflow:hidden}
+.bar span{position:absolute;inset:0 auto 0 0;border-radius:2px}
+.row .v{font:600 13px var(--mono);text-align:right}
+.lvl-0 .bar span{background:var(--bad)} .lvl-1 .bar span{background:var(--warn)} .lvl-2 .bar span{background:var(--ok)}
+[hidden]{display:none!important}
+.lvl-0 .v{color:var(--bad)} .lvl-1 .v{color:var(--warn)} .lvl-2 .v{color:var(--ok)}
+.plan{overflow-x:auto}
+.plan table{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
+.plan th,.plan td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+.plan th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.plan td.d{font:600 13px var(--mono);white-space:nowrap;color:var(--ink)}
+.plan tr.tour td{background:var(--cell);font-weight:600}
+.box{padding:20px}
+.check{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:15px}
+.check li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px}
+.check li::before{content:"";width:16px;height:16px;border:1.5px solid var(--ink);border-radius:2px;margin-top:4px}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+@media (max-width:700px){.tiers{grid-template-columns:minmax(0,1fr)}}
+.tier{padding:20px;display:flex;flex-direction:column;gap:8px;border-right:1px solid var(--rule)}
+.tier:last-child{border-right:0}
+@media (max-width:700px){.tier{border-right:0;border-bottom:1px solid var(--rule)}}
+.tier .price{font:700 24px var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
+.tier ul{margin:0;padding-left:18px;font-size:14px;color:var(--muted)}
+.contact{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:16px 20px;border-top:1px solid var(--rule)}
+.contact code{font:600 15px var(--mono);user-select:all;color:var(--text)}
+.contact a{color:var(--ink)}
+.toast{font-size:13px;color:var(--ok)}
+sup{font-size:.7em}
+@media (prefers-reduced-motion:no-preference){.bar span{transition:width .5s ease}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <aside class="side" aria-label="До тура">
+    <div class="count">
+      <span class="eyebrow">До ближайшего тура</span>
+      <span class="num" id="days">—</span>
+      <span id="nextLabel" style="font-size:14px;color:var(--muted)"></span>
+    </div>
+    <div class="field">
+      <label for="grade">Класс</label>
+      <div class="seg" id="grade" role="group">
+        <button type="button" data-g="9" aria-pressed="false">9</button>
+        <button type="button" data-g="10" aria-pressed="false">10</button>
+        <button type="button" data-g="11" aria-pressed="true">11</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="hours">Часов в день на подготовку</label>
+      <div class="seg" id="hours" role="group">
+        <button type="button" data-h="1" aria-pressed="false">1</button>
+        <button type="button" data-h="2" aria-pressed="true">2</button>
+        <button type="button" data-h="3" aria-pressed="false">3</button>
+      </div>
+    </div>
+    <div class="field">
+      <span class="eyebrow">Отборочный этап 2026/27 · математика</span>
+      <ul class="tours" id="tours"></ul>
+      <p>Каждый тур — 4 часа на ответы и 5 часов на загрузку решения. Пройти можно в любом туре.</p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="intro">
+      <span class="eyebrow">Олимпиада «Физтех» · математика · 9–11 класс</span>
+      <h1>Физтех-отбор: что подтянуть до тура</h1>
+      <p>14 задач по 7 темам отборочного этапа. Впишите ответы — получите карту пробелов и план по дням до ближайшего тура. Около 25 минут, без регистрации.</p>
+      <p>Задачи — базового уровня: если тема проседает здесь, на отборе она не сработает.</p>
+    </header>
+
+    <section class="sheet" aria-labelledby="sh">
+      <div class="sheet-head">
+        <h2 id="sh">Бланк ответов</h2>
+        <span class="meta" id="filled">0 / 14 заполнено</span>
+      </div>
+      <form id="form" autocomplete="off"></form>
+      <div class="actions">
+        <button class="btn" type="submit" form="form">Проверить и построить план</button>
+        <button class="btn ghost" type="button" id="reset">Очистить</button>
+        <span class="hint">Пустой ответ считается как «не решил».</span>
+      </div>
+    </section>
+
+    <section class="result" id="result" aria-live="polite">
+      <div class="sheet">
+        <div class="sheet-head">
+          <h2>Карта пробелов</h2>
+          <span id="sampleBadge" class="badge">Пример · заполните бланк</span>
+        </div>
+        <div class="box"><div class="map" id="map"></div></div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-head">
+          <h2>План до тура</h2>
+          <span class="meta" id="planMeta"></span>
+        </div>
+        <div class="plan"><table><thead><tr><th>День</th><th>Тема</th><th>Что делать</th></tr></thead><tbody id="plan"></tbody></table></div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-head"><h2>Чтобы решение засчитали</h2><span class="meta">чек-лист перед загрузкой</span></div>
+        <div class="box">
+          <ul class="check">
+            <li>Ответ вписан в поле в течение 4 часов, решение загружено в течение 5 — задача без файла решения не засчитывается.</li>
+            <li>Каждый переход обоснован: ОДЗ выписана, при возведении в квадрат — проверка корней.</li>
+            <li>В геометрии есть чертёж с обозначениями, все использованные теоремы названы.</li>
+            <li>В задаче с параметром ответ сведён в одну строку и проверены граничные значения.</li>
+            <li>Скан читается: одна задача — одна страница, номер задачи сверху, без помарок поверх формул.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-head"><h2>Готовиться со мной</h2><span class="meta">Артём Запорожец · Физтех-лицей, МФТИ</span></div>
+        <div class="box" style="padding-bottom:0"><p style="margin:0;max-width:65ch;color:var(--muted)">Я готовлю школьников к отбору «Физтеха»: 95% моих учеников проходили квалификацию. Пришлите результат диагностики — отвечу, какой формат подойдёт.</p></div>
+        <div class="tiers">
+          <div class="tier"><span class="eyebrow">Пакет к туру</span><span class="price">1 490 ₽</span><ul><li>60 задач по вашим слабым темам с разборами</li><li>Пробный тур на 4 часа</li></ul></div>
+          <div class="tier"><span class="eyebrow">Пакет + проверка</span><span class="price">4 900 ₽</span><ul><li>Всё из пакета</li><li>Проверка двух оформленных решений</li><li>Интенсив в группе до 8 человек</li></ul></div>
+          <div class="tier"><span class="eyebrow">Три тура</span><span class="price">9 900 ₽</span><ul><li>Ведение до 7 ноября</li><li>Разбор после каждого тура и новый план</li></ul></div>
+        </div>
+        <div class="contact">
+          <button class="btn" type="button" id="copy">Скопировать результат</button>
+          <span>и отправить в Telegram <a id="tg" href="https://t.me/prog_obsess" target="_blank" rel="noopener"><code>@prog_obsess</code></a> или на почту <code id="mail">wiseacre67@gmail.com</code></span>
+          <span class="toast" id="toast" role="status"></span>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const TOPICS=[
+ {id:"alg",name:"Уравнения",tasks:[
+   {q:"Решите уравнение √(x + 7) = x − 5.",a:9,tip:"При возведении в квадрат появляется посторонний корень. Проверка или условие x ≥ 5."},
+   {q:"Найдите сумму всех корней уравнения |x² − 4x| = 3.",a:8,tip:"Модуль даёт два квадратных уравнения, корни нужно сложить из обоих."}]},
+ {id:"trig",name:"Тригонометрия",tasks:[
+   {q:"Сколько корней имеет уравнение sin 2x = cos x на отрезке [0; 2π]?",a:4,tip:"Не делите на cos x: вынесите его за скобку."},
+   {q:"Найдите наибольшее значение выражения 3 sin x + 4 cos x + 2.",a:7,tip:"a sin x + b cos x ≤ √(a² + b²)."}]},
+ {id:"log",name:"Логарифмы и степени",tasks:[
+   {q:"Решите уравнение log₂x + log₂(x − 2) = 3.",a:4,tip:"ОДЗ: x > 2, корень −2 отбрасывается."},
+   {q:"Найдите сумму корней уравнения 4<sup>x</sup> − 6·2<sup>x</sup> + 8 = 0.",a:3,tip:"Замена t = 2ˣ."}]},
+ {id:"ineq",name:"Неравенства и параметр",tasks:[
+   {q:"Сколько целых x из отрезка [−10; 10] удовлетворяют неравенству (x² − 9) / (x − 5) ≤ 0?",a:10,tip:"Метод интервалов; x = 5 исключается, x = ±3 входят."},
+   {q:"При каком наибольшем целом a уравнение x² − 2ax + a + 6 = 0 не имеет действительных корней?",a:2,tip:"D/4 = a² − a − 6 < 0, то есть −2 < a < 3."}]},
+ {id:"plan",name:"Планиметрия",tasks:[
+   {q:"Катеты прямоугольного треугольника равны 6 и 8. Найдите радиус вписанной окружности.",a:2,tip:"r = (a + b − c) / 2."},
+   {q:"Хорда окружности радиуса 13 равна 24. Найдите расстояние от центра до хорды.",a:5,tip:"Перпендикуляр из центра делит хорду пополам."}]},
+ {id:"stereo",name:"Стереометрия",tasks:[
+   {q:"Найдите квадрат длины диагонали куба с ребром 2.",a:12,tip:"d² = a² + a² + a²."},
+   {q:"В правильной четырёхугольной пирамиде сторона основания 6, высота 4. Найдите апофему.",a:5,tip:"Прямоугольный треугольник: высота и половина стороны основания."}]},
+ {id:"num",name:"Числа и комбинаторика",tasks:[
+   {q:"Сколько натуральных делителей у числа 360?",a:24,tip:"360 = 2³·3²·5, число делителей (3+1)(2+1)(1+1)."},
+   {q:"Сколько существует трёхзначных чисел с суммой цифр 5?",a:15,tip:"Первая цифра ≥ 1: шары и перегородки, C(6, 2)."}]}
+];
+const TOURS=[
+ {n:"1-й тур",date:"2026-10-11",grades:[9,10,11]},
+ {n:"2-й тур",date:"2026-11-01",grades:[9,10,11]},
+ {n:"3-й тур",date:"2026-11-07",grades:[11]}
+];
+const SAMPLE_OK=[1,1,0,1,1,1,0,0,1,1,1,0,1,1];
+const MONTHS=["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"];
+const $=s=>document.querySelector(s);
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let state=Object.assign({grade:11,hours:2,answers:{},checked:false},store.get("fo-state")||{});
+
+function today(){const d=new Date();d.setHours(0,0,0,0);return d}
+function parse(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
+function fmt(d){return d.getDate()+" "+MONTHS[d.getMonth()]}
+function dayDiff(a,b){return Math.round((b-a)/864e5)}
+function nextTour(){const t=today();return TOURS.filter(x=>x.grades.includes(state.grade)).find(x=>parse(x.date)>=t)||null}
+
+function renderSide(){
+  document.querySelectorAll("#grade button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.g===state.grade)));
+  document.querySelectorAll("#hours button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.h===state.hours)));
+  const nt=nextTour(),t=today();
+  $("#tours").innerHTML=TOURS.map(x=>{const d=parse(x.date);const cls=d<t?"past":(nt&&x.date===nt.date?"next":"");const g=x.grades.length<3?" · только 11 кл.":"";return `<li class="${cls}"><span>${x.n}${g}</span><span>${fmt(d)}</span></li>`}).join("");
+  if(nt){const n=dayDiff(t,parse(nt.date));$("#days").textContent=n===0?"сегодня":n;$("#nextLabel").textContent=n===0?nt.n+" сегодня":`${plural(n,"день","дня","дней")} · ${nt.n}, ${fmt(parse(nt.date))}`}
+  else{$("#days").textContent="—";$("#nextLabel").textContent="Туры отбора для вашего класса прошли. План строится на 14 дней к заключительному этапу."}
+}
+function plural(n,a,b,c){const m=n%10,h=n%100;return n+" "+(m===1&&h!==11?a:(m>=2&&m<=4&&(h<12||h>14)?b:c))}
+
+function renderForm(){
+  let k=0;
+  $("#form").innerHTML=TOPICS.map(tp=>`<div class="topic"><div class="topic-name">${tp.name}</div>${tp.tasks.map(ts=>{k++;const id="a"+k;return `<div class="task" data-k="${k}"><span class="n">${String(k).padStart(2,"0")}</span><label class="q" for="${id}">${ts.q}</label><input id="${id}" inputmode="decimal" aria-label="Ответ к задаче ${k}" value="${state.answers[k]??""}"><span class="mark">Верный ответ: ${ts.a}. ${ts.tip}</span></div>`}).join("")}</div>`).join("");
+  $("#form").addEventListener("input",e=>{if(e.target.matches("input")){state.answers[e.target.closest(".task").dataset.k]=e.target.value;state.checked=false;clearMarks();save();countFilled()}});
+  countFilled();
+}
+function countFilled(){const n=Object.values(state.answers).filter(v=>String(v).trim()!=="").length;$("#filled").textContent=n+" / 14 заполнено"}
+function clearMarks(){document.querySelectorAll(".task").forEach(t=>t.classList.remove("ok","bad"));$("#sampleBadge").hidden=false;$("#sampleBadge").textContent="Пример · заполните бланк";render()}
+function isOk(k,a){const v=String(state.answers[k]??"").trim().replace(",",".");return v!==""&&Math.abs(parseFloat(v)-a)<1e-6}
+
+function scores(){
+  let k=0;
+  return TOPICS.map(tp=>{let s=0;tp.tasks.forEach(ts=>{k++;s+=state.checked?(isOk(k,ts.a)?1:0):SAMPLE_OK[k-1]});return {tp,s}});
+}
+function render(){
+  const sc=scores();
+  $("#map").innerHTML=sc.map(({tp,s})=>`<div class="row lvl-${s}"><span>${tp.name}</span><div class="bar"><span style="width:${s/2*100}%"></span></div><span class="v">${s} из 2</span></div>`).join("");
+  renderPlan(sc);
+}
+function renderPlan(sc){
+  const t=today(),nt=nextTour();
+  let days=nt?dayDiff(t,parse(nt.date)):14;
+  const end=nt?parse(nt.date):new Date(t.getTime()+14*864e5);
+  const per=state.hours*5;
+  const order=[...sc].sort((a,b)=>a.s-b.s);
+  const weak=order.filter(x=>x.s===0),mid=order.filter(x=>x.s===1),strong=order.filter(x=>x.s===2);
+  let queue=[];
+  weak.forEach(x=>queue.push({tp:x.tp,what:`Теория + ${per} задач от простых к уровню отбора`},{tp:x.tp,what:`${per} задач уровня отбора, разбор ошибок`}));
+  mid.forEach(x=>queue.push({tp:x.tp,what:`${per} задач уровня отбора, оформить 2 решения полностью`}));
+  const study=Math.max(days-2,0);
+  let rows=[];
+  if(days<=0){rows.push({d:t,topic:"Тур",what:"Сегодня тур. Начните с задач по сильным темам, решение загружайте сразу после ответа.",tour:true})}
+  else{
+    if(queue.length>study){queue=queue.slice(0,study)}
+    while(queue.length<study){const pool=[...weak,...mid,...strong];const x=pool[queue.length%pool.length];queue.push({tp:x?x.tp:TOPICS[0],what:`Смешанный набор: ${per} задач, на время`})}
+    queue.forEach((q,i)=>rows.push({d:new Date(t.getTime()+i*864e5),topic:q.tp.name,what:q.what}));
+    if(days>=2)rows.push({d:new Date(end.getTime()-2*864e5),topic:"Пробный тур",what:"4 часа без перерыва на прошлогодний вариант, потом 1 час на оформление решений"});
+    if(days>=1)rows.push({d:new Date(end.getTime()-864e5),topic:"Разбор",what:"Разобрать ошибки пробного тура, пройти чек-лист оформления. Новых тем не начинать"});
+    rows.push({d:end,topic:nt?nt.n:"Финал",what:nt?"Тур. Ответ — за 4 часа, решение — за 5":"Заключительный этап",tour:true});
+  }
+  const cut=queue.length<(weak.length*2+mid.length);
+  $("#planMeta").textContent=`${state.hours} ч в день · ${state.grade} класс`+(cut?" · не всё влезло: см. тариф «Три тура»":"");
+  $("#plan").innerHTML=rows.map(r=>`<tr class="${r.tour?"tour":""}"><td class="d">${fmt(r.d)}</td><td>${r.topic}</td><td>${r.what}</td></tr>`).join("");
+}
+function save(){store.set("fo-state",state)}
+
+function mark(){
+  let k=0;TOPICS.forEach(tp=>tp.tasks.forEach(ts=>{k++;const el=document.querySelector(`.task[data-k="${k}"]`);el.classList.toggle("ok",isOk(k,ts.a));el.classList.toggle("bad",!isOk(k,ts.a))}));
+  $("#sampleBadge").hidden=true;render();
+}
+$("#form").addEventListener("submit",e=>{
+  e.preventDefault();state.checked=true;save();mark();
+  $("#result").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+});
+$("#reset").addEventListener("click",()=>{state.answers={};state.checked=false;save();renderForm();clearMarks()});
+$("#grade").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.grade=+b.dataset.g;save();renderSide();render()});
+$("#hours").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.hours=+b.dataset.h;save();renderSide();render()});
+$("#copy").addEventListener("click",()=>{
+  const sc=scores();const total=sc.reduce((s,x)=>s+x.s,0);
+  const txt=`Диагностика «Физтех-отбор»${state.checked?"":" (пример, бланк не проверен)"}\nКласс: ${state.grade}, часов в день: ${state.hours}\nИтого: ${total} из 14\n`+sc.map(x=>`${x.tp.name}: ${x.s}/2`).join("\n");
+  const ok=()=>{$("#toast").textContent="Скопировано. Откройте Telegram и вставьте в сообщение."};
+  const fallback=()=>{const r=document.createRange();r.selectNodeContents($("#mail"));const s=getSelection();s.removeAllRanges();s.addRange(r);$("#toast").textContent="Не удалось скопировать: выделил адрес, результат перепишите вручную."};
+  try{navigator.clipboard.writeText(txt).then(ok,fallback)}catch(e){fallback()}
+});
+
+renderSide();renderForm();
+if(state.checked)mark();else render();
+</script>
+
+</body>
+</html>
